@@ -72,7 +72,7 @@ imagePullSecrets:
      ----    ------     ----  ----               -------
      Normal  Scheduled  17s   default-scheduler  Successfully assigned default/my-app-857d6c47d-jpdsz to minikube
      Normal  Pulling    17s   kubelet            Pulling image "922854651834.dkr.ecr.us-east-1.amazonaws.com/myapp:latest"
-     Normal  Pulled     18s   kubelet            Successfully pulled image "922854651834.dkr.ecr.us-east-1.amazonaws.com/myapp:1.0"
+     Normal  Pulled     18s   kubelet            Successfully pulled image "922854651834.dkr.ecr.us-east-1.amazonaws.com/my-app:1.0"
      Normal  Created    19s   kubelet            Created container my-app
      Normal  Started    19s   kubelet            Started container my-app
    ```
