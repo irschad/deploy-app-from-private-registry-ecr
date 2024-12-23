@@ -10,7 +10,50 @@ This project demonstrates how to deploy a web application in a Kubernetes cluste
 - Docker
 
 ## Project Steps
-### 1. Create Secrets for Private Docker Registry Credentials
+
+### 0. Verify Login to Amazon ECR
+Before proceeding, ensure that you can log in to your Amazon ECR registry successfully:
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 922854651834.dkr.ecr.us-east-1.amazonaws.com
+```
+If the login is successful, the command will confirm the connection to the registry.
+
+### 1. Create Credentials for Private Docker Registry
+To pull images from a private Docker registry (Amazon ECR), Kubernetes needs access credentials. Follow these steps:
+
+1. Retrieve the password for ECR using the following command:
+   ```bash
+   aws ecr get-login-password
+   ```
+   This will output a password that will be used in the next step.
+
+2. SSH into the Minikube environment:
+   ```bash
+   minikube ssh
+   ```
+
+3. Log in to the ECR registry from within Minikube:
+   ```bash
+   docker login --username AWS -p <password> https://922854651834.dkr.ecr.us-east-1.amazonaws.com
+   ```
+   This will store the credentials in `/home/docker/.docker/config.json` with the message:
+   "Your password will be stored unencrypted in /home/docker/.docker/config.json."
+
+4. Exit Minikube:
+   ```bash
+   exit
+   ```
+
+5. Copy the Docker credentials file from Minikube to the host machine:
+   ```bash
+   minikube cp minikube:/home/docker/.docker/config.json /home/irschad/.docker/config.json
+   ```
+
+The copied `config.json` file will be used in the next step to create the Kubernetes Secret.
+
+
+### 2. Create Kubernetes Secrets:
 To pull images from a private Docker registry (Amazon ECR), Kubernetes needs access credentials. This can be done using the following methods:
 
 #### Method 1: Using Docker Config File
@@ -28,8 +71,8 @@ kubectl create secret docker-registry my-registry-key-two \
   --docker-password=$(aws ecr get-login-password --region us-east-1)
 ```
 
-### 2. Configure the Docker Registry Secret in Application Deployment Files
-Two separate Secrets are used for deploying two applications. The Deployment YAML files reference these Secrets to authenticate and pull the application images from the private registry.
+### 3. Create Application Deployment Files
+For testing purpose, two separate Secrets are used for deploying the application twice. The Deployment YAML files reference these Secrets to authenticate and pull the container image from the private registry.
 
 #### Deployment Files
 - **`myapp-deployment.yaml`**: References `my-registry-key`.
@@ -41,7 +84,7 @@ imagePullSecrets:
   - name: <secret-name>
 ```
 
-### 3. Deploy Web Application Images
+### 4. Deploy the Web Application
 
 #### Steps:
 1. Apply the Secret and Deployment configuration files to the Kubernetes cluster.
@@ -71,7 +114,7 @@ imagePullSecrets:
      Type    Reason     Age   From               Message
      ----    ------     ----  ----               -------
      Normal  Scheduled  17s   default-scheduler  Successfully assigned default/my-app-857d6c47d-jpdsz to minikube
-     Normal  Pulling    17s   kubelet            Pulling image "922854651834.dkr.ecr.us-east-1.amazonaws.com/myapp:latest"
+     Normal  Pulling    17s   kubelet            Pulling image "922854651834.dkr.ecr.us-east-1.amazonaws.com/my-app:latest"
      Normal  Pulled     18s   kubelet            Successfully pulled image "922854651834.dkr.ecr.us-east-1.amazonaws.com/my-app:1.0"
      Normal  Created    19s   kubelet            Created container my-app
      Normal  Started    19s   kubelet            Started container my-app
