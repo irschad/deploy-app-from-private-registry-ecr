@@ -54,7 +54,7 @@ The copied `config.json` file will be used in the next step to create the Kubern
 
 
 ### 2. Create Kubernetes Secrets:
-To pull images from a private Docker registry (Amazon ECR), Kubernetes needs access credentials. This can be done using the following methods (Note: These are alternatives to using docker-secret.yaml and applying it through `kubectl apply -f docker-secret.yaml`):
+To pull images from a private Docker registry (Amazon ECR), Kubernetes needs access credentials. This can be done using the following methods (Note: These are alternatives to using docker-secret.yaml and applying it through `kubectl apply -f docker-secret.yaml` command):
 
 #### Method 1: Using Docker Config File
 ```bash
